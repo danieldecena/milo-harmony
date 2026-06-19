@@ -15,12 +15,19 @@ Two things coexist here:
    Harmony 25.2 Premium. The MCP server above is what feeds Claude the
    Harmony API knowledge needed to write/validate these scripts.
 
+## Quick start
+
+```bash
+milo    # alias: cd ~/milo/server && claude
+```
+
 ## Setup
 
 ```bash
-# Python 3.12+ required
+# Python 3.12+ minimum (3.14 installed via Homebrew); uv manages the env
 uv sync                                    # installs deps from uv.lock
 # OR: pip install -e .
+
 
 # Optional: set custom help-doc path
 export HARMONY_HELP_PATH=~/path/to/harmony-help
@@ -65,55 +72,17 @@ When writing or editing `harmony-scripts/*.js`, validate any new API calls:
 uv run scripts/validate_harmony_api.py harmony-scripts
 ```
 
-## ── Milo animation project ──────────────────────────────────────────────────
+## ── Milo animation scripts ───────────────────────────────────────────────────
 
-This section is unique to the animation, not the MCP server.
+Scripts in `harmony-scripts/` are the source of truth. After editing, copy to:
+`~/Library/Preferences/Toon Boom Animation/Toon Boom Harmony Premium/2500-scripts/`
 
-### Scripts live in two places
-
-- `harmony-scripts/` — source of truth in this repo (git-tracked)
-- `~/Library/Preferences/Toon Boom Animation/Toon Boom Harmony Premium/2500-scripts/`
-  — where Harmony's Script Editor actually loads them
-
-Keep them in sync. `install-harmony-mcp.sh` and related scripts may sync them
-for you; otherwise copy manually.
+For scene structure, layer order, color palette, and character constraints — see [MILO_GOAL.md](MILO_GOAL.md) and `~/milo/scenes/CLAUDE.md`.
 
 ### Key script files
-
-- `MiloMasterRun.js` — orchestrator, runs all setup steps in order
-- `MiloSetup.js` — creates 12 layers + 16-color palette
-- `MiloRig.js`, `MiloDrawings.js`, `MiloExpressions.js`, `MiloBackgrounds.js`,
-  `MiloCamera.js`, `MiloSceneVisibility.js` — per-domain setup
-
-### Scene structure
-- 1440 frames @ 24fps = 60 seconds total
-- Scene 1 (1–360): Sleeping / Cozy Home
-- Scene 2 (361–1200): Golden Hour / Playful
-- Scene 3 (1201–1440): Doggy Heaven
-
-### Layers (bottom → top)
-BG_Heaven, BG_GoldenHour, BG_CozyHome,
-MILO_Leg_BR, MILO_Leg_BL, MILO_Leg_FR, MILO_Leg_FL,
-MILO_Body_A, MILO_Wrinkles_B3, MILO_Mouth_B4,
-MILO_Eyes_B2, MILO_Head_B1
-
-### Colors — never change these HEX values
-```
-Coat_Fawn      #C8A876   Cream_Belly   #E8D9BC
-Eyes_Brown     #6B4226   Nose_Dark     #3D2314
-Ear_Blush      #E8B89A   Linework      #2C1A0E
-Shadow         #A8845A   Moms_Aura     #B8A0D4
-Aura_Lavender  #D4C0E8   Aura_Blue     #A0B8D4
-Heaven_Blue    #B8D4F0   Heaven_White  #E8F4FF
-Sky_Gold       #F5C842   Grass_Rich    #7A9E4E
-Home_Warm      #E8D5B0   Lamp_Glow     #FFE0A0
-```
-
-### Character constraints
-- French Bulldog, fawn coat, **NO bandana**
-- Bat ears, dark muzzle, soft wrinkles
-- White chest patch, short nub tail
-- Mom's purple/blue aura (#B8A0D4) appears in every scene
+- `MiloMasterRun.js` — orchestrator; run this first, it calls all others in order
+- `MiloSetup.js` — scene duration, 12 layers, `Milo_Colors` palette
+- `MiloExpressions.js` — `applyMiloExpression("Happy", frame)` is the public API
 
 ### Harmony API — USE these
 - `scene.setStopFrame(1440)`
